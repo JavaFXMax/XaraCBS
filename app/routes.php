@@ -37,7 +37,7 @@ Route::get('/dashboard', function()
 
 
         if(Confide::user()->user_type == 'admin'){
-
+            
             $members = Member::all();
 
             return View::make('dashboard', compact('members'));
@@ -56,12 +56,13 @@ Route::get('/dashboard', function()
         if(Confide::user()->user_type == 'member'){
 
             $loans = Loanproduct::all();
+            $member = Member::where('membership_no',Confide::user()->username)->first();            
             $products = Product::all();
 
-            $rproducts = Product::getRemoteProducts();
+            //$rproducts = Product::getRemoteProducts();
 
             
-            return View::make('shop.index', compact('loans', 'products', 'rproducts'));
+            return View::make('css.memberindex', compact('loans', 'member', 'products'));
 
         } 
 
@@ -72,6 +73,155 @@ Route::get('/dashboard', function()
 });
 //
 
+
+Route::get('member', function(){
+
+   
+    $member = Member::where('membership_no',Confide::user()->username)->first();
+
+    return View::make('css.memberindex', compact('member'));
+
+});
+
+
+Route::get('memberloanrepayments', function(){
+    $m = Member::where('membership_no',Confide::user()->username)->first();
+    $member = Member::findOrFail($m->id);
+    /*$loanaccounts = DB::table('loanaccounts')
+                       ->join('loanproducts', 'loanaccounts.loanproduct_id', '=', 'loanproducts.id')
+                       ->join('members', 'loanaccounts.member_id', '=', 'members.id')
+                       ->where('loanaccounts.member_id',$member->id)
+                       ->where('loanaccounts.is_approved',1)
+                       ->select('loanaccounts.id as id','members.name as mname','members.id as mid','loanproducts.name as pname','phone','application_date','amount_applied','repayment_duration','loanaccounts.interest_rate')
+                       ->get();*/
+
+    return View::make('css.loanrepayment', compact('member'));
+
+});
+
+Route::post('loanpayment/{id}', function(){
+   $name = Input::get('mname');
+   $date = Input::get('date');
+   $phone = Input::get('phone');
+   $mid = Input::get('mid');
+   $loanaccount_id = Input::get('loanaccount_id');
+   $amount = Input::get('amount');
+    View::addLocation(app_path() . '/views/pesapal-php-master');
+    View::addNamespace('theme', app_path() .'/views/pesapal-php-master');
+   
+    return View::make('pesapal-iframe', compact('name','date','phone','amount','mid','loanaccount_id'));
+
+});
+
+
+Route::post('memberloanrepayments/offsetloan', function(){
+   $name = Input::get('mname');
+   $date = Input::get('date');
+   $phone = Input::get('phone');
+   $mid = Input::get('mid');
+   $loanaccount_id = Input::get('loanaccount_id');
+   $amount = Input::get('amount');
+    View::addLocation(app_path() . '/views/pesapal-php-master');
+    View::addNamespace('theme', app_path() .'/views/pesapal-php-master');
+   
+    return View::make('pesapal-iframe-offset', compact('name','date','phone','amount','mid','loanaccount_id'));
+
+});
+
+Route::get('/pesapal_callback', function(){
+   $validator = Validator::make($data = Input::all(), Loanrepayment::$rules);
+
+    if ($validator->fails())
+    {
+      return Redirect::back()->withErrors($validator)->withInput();
+    }
+
+    $loanaccount = Input::get('loanaccount_id');
+    Loanrepayment::repayLoan($data);
+    return Redirect::to('/memberloanrepayments')->withFlashMessage('You have successfully paid this month`s loan instalment!');
+
+});
+
+Route::get('/pesapal_callback_offset', function(){
+   $validator = Validator::make($data = Input::all(), Loanrepayment::$rules);
+
+    if ($validator->fails())
+    {
+      return Redirect::back()->withErrors($validator)->withInput();
+    }
+
+    $loanaccount = Input::get('loanaccount_id');
+    Loanrepayment::offsetLoan($data);
+    return Redirect::to('/memberloanrepayments')->withFlashMessage('You have successfully completed paying your loan!');
+
+});
+
+
+Route::post('membersavingtransactions/{id}', function(){
+  if(Input::get('type') == 'credit'){
+   $transacted_by = Input::get('transacted_by');
+   $date = Input::get('date');
+   $ttype = Input::get('type');
+   $phone = Input::get('phone');
+   $mid = Input::get('mid');
+   $description = Input::get('description');
+   $account_id = Input::get('account_id');
+   $amount = Input::get('amount');
+    View::addLocation(app_path() . '/views/pesapal-php-master');
+    View::addNamespace('theme', app_path() .'/views/pesapal-php-master');
+   
+    return View::make('pesapal-iframe-savings', compact('transacted_by','description','date','phone','amount','mid','account_id','ttype'));
+}else{
+  $validator = Validator::make($data = Input::all(), Savingtransaction::$rules);
+
+    if ($validator->fails())
+    {
+      return Redirect::back()->withErrors($validator)->withInput();
+    }
+
+    $date = Input::get('date');
+    $transAmount = Input::get('amount');
+    $currency = Currency::find(1);
+
+    $savingaccount = Savingaccount::findOrFail(Input::get('account_id'));
+    $date = Input::get('date');
+    $amount = Input::get('amount');
+    $type = Input::get('type');
+    $description = Input::get('description');
+    $transacted_by = Input::get('transacted_by');
+
+
+    Savingtransaction::transact($date, $savingaccount, $amount, $type, $description, $transacted_by);
+
+    return Redirect::to('memtransactions/'.$savingaccount->id)->withFlashMessage('You have successfully withdrawn '.$currency->shortname.'. '.number_format($transAmount,2).' from your savings account!');
+}
+});
+
+Route::get('/pesapal_callback_saving', function(){
+   $validator = Validator::make($data = Input::all(), Savingtransaction::$rules);
+
+    if ($validator->fails())
+    {
+      return Redirect::back()->withErrors($validator)->withInput();
+    }
+
+    $date = Input::get('date');
+    $transAmount = Input::get('amount');
+    $currency = Currency::find(1);
+
+    $savingaccount = Savingaccount::findOrFail(Input::get('account_id'));
+    $date = Input::get('date');
+    $amount = Input::get('amount');
+    $type = Input::get('type');
+    $description = Input::get('description');
+    $transacted_by = Input::get('transacted_by');
+
+
+    Savingtransaction::transact($date, $savingaccount, $amount, $type, $description, $transacted_by);
+
+    return Redirect::to('memtransactions/'.$savingaccount->id)->withFlashMessage('You have successfully deposited '.$currency->shortname.'. '.number_format($amount,2).' to your savings account!');
+
+});
 
 
 Route::get('transaudits', function(){
@@ -367,12 +517,16 @@ Route::get('groups/delete/{id}', 'GroupsController@destroy');
 Route::get('groups/edit/{id}', 'GroupsController@edit');
 
 
+
 Route::resource('members', 'MembersController');
 Route::post('members/update/{id}', 'MembersController@update');
+Route::post('member/update/{id}', 'MembersController@update');
 Route::get('members/delete/{id}', 'MembersController@destroy');
 Route::get('members/edit/{id}', 'MembersController@edit');
-
+Route::get('member/edit/{id}', 'MembersController@edit');
 Route::get('members/show/{id}', 'MembersController@show');
+Route::get('member/show/{id}', 'MembersController@show');
+Route::post('deldoc', 'MembersController@deletedoc');
 Route::get('members/loanaccounts/{id}', 'MembersController@loanaccounts');
 Route::get('memberloans', 'MembersController@loanaccounts2');
 Route::group(['before' => 'limit'], function() {
@@ -421,7 +575,11 @@ Route::get('savingproducts/edit/{id}', 'SavingproductsController@edit');
 Route::get('savingproducts/show/{id}', 'SavingproductsController@show');
 
 
-
+Route::resource('monthlyremittances', 'RemittancesController');
+Route::post('monthlyremittances/update/{id}', 'RemittancesController@update');
+Route::get('monthlyremittances/delete/{id}', 'RemittancesController@destroy');
+Route::get('monthlyremittances/edit/{id}', 'RemittancesController@edit');
+Route::get('monthlyremittances/show/{id}', 'RemittancesController@show');
 
 Route::resource('savingaccounts', 'SavingaccountsController');
 Route::get('savingaccounts/create/{id}', 'SavingaccountsController@create');
@@ -432,6 +590,7 @@ Route::get('member/savingaccounts/{id}', 'SavingaccountsController@memberaccount
 Route::get('savingtransactions/show/{id}', 'SavingtransactionsController@show');
 Route::resource('savingtransactions', 'SavingtransactionsController');
 Route::get('savingtransactions/create/{id}', 'SavingtransactionsController@create');
+Route::get('membersavingtransactions/create/{id}', 'SavingtransactionsController@create');
 Route::get('savingtransactions/receipt/{id}', 'SavingtransactionsController@receipt');
 Route::get('savingtransactions/statement/{id}', 'SavingtransactionsController@statement');
 Route::get('savingtransactions/void/{id}', 'SavingtransactionsController@void');
@@ -463,21 +622,12 @@ Route::post('license/activate', 'OrganizationsController@activate_license');
 Route::get('license/activate/{id}', 'OrganizationsController@activate_license_form');
 
 
-
-
-
-
-
-
-
-
-
 Route::resource('loanproducts', 'LoanproductsController');
 Route::post('loanproducts/update/{id}', 'LoanproductsController@update');
 Route::get('loanproducts/delete/{id}', 'LoanproductsController@destroy');
 Route::get('loanproducts/edit/{id}', 'LoanproductsController@edit');
 Route::get('loanproducts/show/{id}', 'LoanproductsController@show');
-
+Route::get('memberloanshow/{id}', 'LoanproductsController@memberloanshow');
 
 
 Route::resource('loanguarantors', 'LoanguarantorsController');
@@ -485,7 +635,8 @@ Route::post('loanguarantors/update/{id}', 'LoanguarantorsController@update');
 Route::get('loanguarantors/delete/{id}', 'LoanguarantorsController@destroy');
 Route::get('loanguarantors/edit/{id}', 'LoanguarantorsController@edit');
 Route::get('loanguarantors/create/{id}', 'LoanguarantorsController@create');
-Route::get('loanguarantors/css/{id}', 'LoanguarantorsController@csscreate');
+Route::get('memberloanguarantors/create/{id}', 'LoanguarantorsController@create');
+Route::get('loanguarantors/css/{id}', 'LoanguarantorsController@create');
 
 Route::post('loanguarantors/cssupdate/{id}', 'LoanguarantorsController@cssupdate');
 Route::get('loanguarantors/cssdelete/{id}', 'LoanguarantorsController@cssdestroy');
@@ -495,12 +646,15 @@ Route::get('loanguarantors/cssedit/{id}', 'LoanguarantorsController@cssedit');
 
 Route::resource('loans', 'LoanaccountsController');
 Route::get('loans/apply/{id}', 'LoanaccountsController@apply');
+Route::get('guarantorapproval', 'LoanaccountsController@guarantor');
 Route::post('loans/apply', 'LoanaccountsController@doapply');
 Route::post('loans/application', 'LoanaccountsController@doapply2');
 
 
 Route::get('loantransactions/statement/{id}', 'LoantransactionsController@statement');
 Route::get('loantransactions/receipt/{id}', 'LoantransactionsController@receipt');
+Route::get('loanapplication/member', 'LoanaccountsController@member');
+Route::post('loanapplication/form', 'LoanaccountsController@application');
 
 Route::get('loans/application/{id}', 'LoanaccountsController@apply2');
 Route::post('shopapplication', 'LoanaccountsController@shopapplication');
@@ -510,7 +664,8 @@ Route::post('loans/update/{id}', 'LoanaccountsController@update');
 
 Route::get('loans/approve/{id}', 'LoanaccountsController@approve');
 Route::post('loans/approve/{id}', 'LoanaccountsController@doapprove');
-
+Route::post('gurantorapprove/{id}', 'LoanaccountsController@guarantorapprove');
+Route::post('gurantorreject/{id}', 'LoanaccountsController@guarantorreject');
 
 Route::get('loans/reject/{id}', 'LoanaccountsController@reject');
 Route::post('rejectapplication', 'LoanaccountsController@rejectapplication');
@@ -519,6 +674,7 @@ Route::get('loans/disburse/{id}', 'LoanaccountsController@disburse');
 Route::post('loans/disburse/{id}', 'LoanaccountsController@dodisburse');
 
 Route::get('loans/show/{id}', 'LoanaccountsController@show');
+Route::get('memberloan/show/{id}', 'LoanaccountsController@show');
 
 Route::post('loans/amend/{id}', 'LoanaccountsController@amend');
 
@@ -534,26 +690,28 @@ Route::get('memloans/{id}', 'LoanaccountsController@show2');
 Route::resource('loanrepayments', 'LoanrepaymentsController');
 
 Route::get('loanrepayments/create/{id}', 'LoanrepaymentsController@create');
+Route::get('memberloanrepayments/create/{id}', 'LoanrepaymentsController@create');
 Route::get('loanrepayments/offset/{id}', 'LoanrepaymentsController@offset');
+//Converting and recovering loans routes
+Route::get('loanrepayments/recover/{id}', 'LoanrepaymentsController@recoverloan');
+Route::get('loanrepayments/convert/{id}', 'LoanrepaymentsController@convert');
+Route::post('loanrepayments/recover/complete','LoanrepaymentsController@doRecover');
+Route::post('loanrepayments/convert/commit','LoanrepaymentsController@doConvert');
+//Guarantor Liabilities
+Route::resource('loanliabilities', 'LoanliabilitiesController');
+
+Route::get('memberloanrepayments/offset/{id}', 'LoanrepaymentsController@offset');
 Route::post('loanrepayments/offsetloan', 'LoanrepaymentsController@offsetloan');
-
-
-
-
-
 Route::get('reports', function(){
 
     return View::make('members.reports');
 });
-
 Route::get('reports/combined', function(){
 
     $members = Member::all();
 
     return View::make('members.combined', compact('members'));
 });
-
-
 Route::get('loanreports', function(){
 
     $loanproducts = Loanproduct::all();
@@ -605,12 +763,6 @@ Route::get('portal/deactivate/{id}', 'MembersController@deactivateportal');
 Route::get('css/reset/{id}', 'MembersController@reset');
 
 
-
-
-
-
-
-
 /*
 * Vendor controllers
 */
@@ -660,42 +812,31 @@ Route::get('savings', function(){
     return View::make('css.savingaccounts', compact('member'));
 });
 
-
+///The post loanguarantors:: Just checking if the selected guarantor has existing loan that they are servicing
 Route::post('loanguarantors', function(){
-
-    
-    $mem_id = Input::get('member_id');
-
-        $member = Member::findOrFail($mem_id);
-
+        $mem_id = Input::get('member_id');       
+        $member = Member::where('id',$mem_id)->get();
+        if(count($member)<1){
+          return Redirect::back()->withNull('You have not selected any guarantor! Select one to continue...');
+        }
         $loanaccount = Loanaccount::findOrFail(Input::get('loanaccount_id'));
-
-
+        $check_member=Loanaccount::where('member_id',$mem_id)->get();
+        if(count($check_member)>1){
+          return Redirect::back()->withBang('The selected member already services a loan, hence cannot guarantee the loan.');
+        }else{
         $guarantor = new Loanguarantor;
-
         $guarantor->member()->associate($member);
         $guarantor->loanaccount()->associate($loanaccount);
-        $guarantor->amount = Input::get('amount');
         $guarantor->save();
-        
-
-
         return Redirect::to('memloans/'.$loanaccount->id);
-
+      }
 });
-
-
 Route::resource('audits', 'AuditsController');
 
 Route::get('backups', function(){
-
-   
     //$backups = Backup::getRestorationFiles('../app/storage/backup/');
-
     return View::make('backup');
-
 });
-
 
 Route::get('backups/create', function(){
 
@@ -928,6 +1069,12 @@ Route::post('import/savings', function(){
 
 });
 
+Route::get('api/dropdown', function(){
+    $id = Input::get('option');
+    $bbranch = Bank::find($id)->bankbranch;
+    return $bbranch->lists('bank_branch_name', 'id');
+});
+
 
 Route::post('import/loans', function(){
 
@@ -998,16 +1145,171 @@ Route::post('import/loans', function(){
 
 });
 
+Route::get('mpesa',function(){
+   
+});
+
+Route::get('api/label', function(){
+    $id = Input::get('option');
+    $currency = Currency::find(1);
+    $loanproduct = Loanproduct::find($id);
+    return $currency->shortname.'. '.number_format($loanproduct->auto_loan_limit,2);
+});
+
+
+/*
+* banks routes
+*/
+
+Route::resource('banks', 'BanksController');
+Route::post('banks/update/{id}', 'BanksController@update');
+Route::get('banks/delete/{id}', 'BanksController@destroy');
+Route::get('banks/edit/{id}', 'BanksController@edit');
+Route::get('banksimport', function(){
+    return View::make('banks.import');
+});
+
+/*
+* bank branch routes
+*/
+
+Route::resource('bankbranches', 'BankBranchController');
+Route::post('bankbranches/update/{id}', 'BankBranchController@update');
+Route::get('bankbranches/delete/{id}', 'BankBranchController@destroy');
+Route::get('bankbranches/edit/{id}', 'BankBranchController@edit');
+Route::get('bankbranchesimport', function(){
+    return View::make('bank_branch.import');
+});
 
 
 
+/* #################### IMPORT BANK BRANCHES ################################## */
+
+Route::post('import/bankBranches', function(){
+
+  
+  if(Input::hasFile('bbranches')){
+
+      $destination = public_path().'/migrations/';
+
+      $filename = str_random(12);
+
+      $ext = Input::file('bbranches')->getClientOriginalExtension();
+      $file = $filename.'.'.$ext;
 
 
 
+      
+      
+     
+      Input::file('bbranches')->move($destination, $file);
+
+
+  
+
+
+  Excel::selectSheetsByIndex(0)->load(public_path().'/migrations/'.$file, function($reader){
+
+    $results = $reader->get();    
+  
+    foreach ($results as $result) {
+  
+
+    $bbranch = new BBranch;
+
+    $bbranch->branch_code = $result->branch_code;
+
+    $bbranch->bank_branch_name = $result->branch_name;
+
+    $bbranch->bank_id = $result->bank_id;
+
+    $bbranch->organization_id = $result->organization_id;
+
+    $bbranch->save();
+      
+    }   
+
+  });
+      
+    }
+
+
+  return Redirect::route('bankbranches.index')->with('notice', 'bank branches have been succefully imported');
 
 
 
+  
 
+});
+
+/* #################### IMPORT BANKS ################################## */
+
+Route::post('import/banks', function(){
+
+  
+  if(Input::hasFile('banks')){
+
+      $destination = public_path().'/migrations/';
+
+      $filename = str_random(12);
+
+      $ext = Input::file('banks')->getClientOriginalExtension();
+      $file = $filename.'.'.$ext;
+
+
+
+      
+      
+     
+      Input::file('banks')->move($destination, $file);
+
+
+  
+
+
+  Excel::selectSheetsByIndex(0)->load(public_path().'/migrations/'.$file, function($reader){
+
+    $results = $reader->get();    
+  
+    foreach ($results as $result) {
+  
+
+    $bank = new Bank;
+
+    $bank->bank_name = $result->bank_name;
+
+    $bank->bank_code = $result->bank_code;
+
+    $bank->organization_id = $result->organization_id;
+
+    $bank->save();
+      
+    }   
+
+  });
+      
+    }
+
+
+  return Redirect::route('banks.index')->with('notice', 'banks have been succefully imported');
+
+
+
+  
+
+});
+
+
+Route::get('api/loans', function(){
+    $id = Input::get('option');
+    $loans = DB::table('Loanaccounts')
+                 ->join('loanproducts', 'loanaccounts.loanproduct_id', '=', 'loanproducts.id')
+                 ->where('member_id',$id)
+                 ->select('loanaccounts.id as id','loanproducts.name as name')
+                 ->lists('name','id');
+    
+    return $loans;
+});
 
 
 

@@ -6,7 +6,8 @@ class Member extends \Eloquent {
 	public static $rules = [
 		 'name' => 'required',
 		 'membership_no' => 'required',
-		 'branch_id' => 'required'
+		 'branch_id' => 'required',
+		 'phone' => 'required'
 	];
 
 	// Don't forget to fill this array
@@ -16,6 +17,19 @@ class Member extends \Eloquent {
 	public function branch(){
 
 		return $this->belongsTo('Branch');
+	}
+
+	public static function getBank($id){
+	  if($id == 0){
+      return '';
+	  }else{
+      return Bank::find($id)->pluck('name');
+      }
+	}
+
+	public function bank(){
+
+		return $this->belongsTo('Bank');
 	}
 
 	public function group(){
@@ -45,6 +59,11 @@ class Member extends \Eloquent {
 	public function loanaccounts(){
 
 		return $this->hasMany('Loanaccount');
+	}
+
+	public function documents(){
+
+		return $this->hasMany('Document');
 	}
 
 

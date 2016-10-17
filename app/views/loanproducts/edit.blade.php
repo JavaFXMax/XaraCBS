@@ -120,6 +120,15 @@
             </select>
         </div>
 
+         <div class="form-group">
+            <label for="username">Auto Loan Limit</label>
+
+            <div class="input-group">
+            <span class="input-group-addon">{{$currency->shortname}}</span>
+            <input class="form-control" placeholder="" type="text" name="autoloanlimit" id="autoloanlimit" value="{{$loanproduct->auto_loan_limit}}">
+            </div>
+            </div>
+
 
     </div>
 

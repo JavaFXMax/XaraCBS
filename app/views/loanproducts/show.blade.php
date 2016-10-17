@@ -49,6 +49,11 @@
 
           </tr>
 
+          <tr>
+            <td>Auto Loan Limit</td><td>{{number_format($loanproduct->auto_loan_limit,2)}}</td>
+
+          </tr>
+
       </table>
 
   </div>

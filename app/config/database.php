@@ -55,9 +55,9 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'xarad',
+			'database'  => 'cbs',
 			'username'  => 'root',
-			'password'  => '',
+			'password'  => 'K0049521m',
 			'port' => '3306',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',

@@ -22,6 +22,12 @@
 
       <li>
 
+        <a href="{{ URL::to('loanapplication/member') }}" target="_blank"> Loan Application Form</a>
+
+      </li>
+
+      <li>
+
         <a href="{{ URL::to('reports/loanlisting') }}" target="_blank"> Loan Listing report</a>
 
       </li>

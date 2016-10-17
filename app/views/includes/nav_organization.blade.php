@@ -24,6 +24,14 @@
                         <a href="{{ URL::to('currencies') }}"><i class="fa fa-list-alt fa-fw"></i> Currency</a>
                     </li>
 
+                    <li>
+                        <a href="{{ URL::to('banks') }}"><i class="fa fa-list-alt fa-fw"></i> Banks</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ URL::to('bankbranches') }}"><i class="fa fa-list-alt fa-fw"></i> Bank Branches</a>
+                    </li>
+
                     
                     
 

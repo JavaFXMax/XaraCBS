@@ -10,83 +10,82 @@ function asMoney($value) {
 }
 
 ?>
-
 <div class="row">
-
 <div class="col-lg-4">
-
-
 <table class="table table-hover">
-
   <tr>
     <td>Member</td><td>{{ $loanaccount->member->name }}</td>
   </tr>
   <tr>
     <td>Loan Account</td><td>{{ $loanaccount->account_number }}</td>
   </tr>
-
 </table>
-
-
 </div>	
-
-
-
+  <div class="col-lg-8 pull-right">
+     @if (Session::has('recover'))
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{{ Session::get('recover') }}}</strong> 
+          </div>      
+      @endif     
+       @if (Session::has('convert'))
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{{ Session::get('convert') }}}</strong> 
+          </div>      
+      @endif     
+     @if (Session::has('flash_message'))
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{{ Session::get('flash_message') }}}</strong> 
+          </div>      
+      @endif     
+       @if (Session::has('delete_message'))
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{{ Session::get('delete_message') }}}</strong> 
+          </div>      
+      @endif           
+</div>
 <div class="col-lg-5 pull-right">
-
  <a  class="btn btn-success btn-sm" href="{{ URL::to('loanrepayments/create/'.$loanaccount->id) }}"> <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Repay Loan</a>
  <a  class="btn btn-success btn-sm" href="{{ URL::to('loanrepayments/offset/'.$loanaccount->id) }}"> <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Offset Loan</a>
 
-<!--
- <a  class="btn btn-success btn-sm" href="{{ URL::to('loanaccounts/reschedule/'.$loanaccount->id) }}"> <span class="glyphicon glyphicon-random" aria-hidden="true"></span>  Reschedule Loan</a>
--->
  <a  class="btn btn-success btn-sm" href="{{ URL::to('loanaccounts/topup/'.$loanaccount->id) }}"> <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Top up Loan</a>
-
 </div>
-
+<div class="col-lg-5 pull-right" style="margin-top: 1.8%;">
+  <a  class="btn btn-primary btn-sm" href="{{ URL::to('loanrepayments/recover/'.$loanaccount->id) }}"> 
+  <span class="fa fa-hand-paper-o" aria-hidden="true"></span> Recover Loan</a>
+<a  class="btn btn-warning btn-sm" href="{{ URL::to('loanrepayments/convert/'.$loanaccount->id) }}"> 
+  <span class="fa fa-line-chart" aria-hidden="true"></span> Convert Loan</a>
 </div>
-
-
-
+</div>
 <hr>
-
 <div class="row">
-
-
-
-
 <div class="col-lg-4">
-
 <table class="table table-bordered table-hover">
-
 	<tr>
-
 		<td>Loan Type</td><td>{{ $loanaccount->loanproduct->name}}</td>
-
-
 	</tr>
 	<tr>
-
 		<td>Date Disbursed</td><td>{{ $loanaccount->date_disbursed}}</td>
-
-
 	</tr>
 	<tr>
-
 		<td>Amount Disbursed</td><td>{{ asMoney($loanaccount->amount_disbursed)}}</td>
-
-
 	</tr>
-
   @if($loanaccount->is_top_up)
   <tr>
-
     <td>Top Up Amount</td><td>{{ asMoney($loanaccount->top_up_amount)}}</td>
-
-
   </tr>
   @endif
-
   <!--
 
 	<tr>
@@ -215,11 +214,6 @@ function asMoney($value) {
 </div>
 
 
-
-
-
-
-
 </div>
 
 
@@ -231,27 +225,17 @@ function asMoney($value) {
 
 </div>	
 </div>
-
-
-
-
-
-
 <div class="row">
 
 
 	<div class="col-lg-12">
-
-
-
-
 		<div role="tabpanel">
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#remittance" aria-controls="remittance" role="tab" data-toggle="tab">Loan Schedule</a></li>
     <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Loan Transactions</a></li>
-    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Loan Guarantors</a></li>
+   <!-- <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Loan Guarantors</a></li>-->
 
   </ul>
 

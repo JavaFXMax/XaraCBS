@@ -49,17 +49,11 @@
             <input class="form-control" placeholder="" type="text" name="goodwill" id="goodwill" value="{{{ Input::old('goodwill') }}}">
         </div>
         
-
+         <div class="form-group">
+            <label for="username">Contact</label>
+            <textarea class="kindata" name="contact" id="contact">{{{ Input::old('contact') }}}</textarea>
+        </div>
         
-
-
-
-
-
-
-
-        
-      
         
         <div class="form-actions form-group">
         

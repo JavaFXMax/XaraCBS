@@ -39,12 +39,6 @@ class Loanproduct extends \Eloquent {
 
 		//$charges = Input::get('charge');
 
-
-
-
-		
-
-
 		$loanproduct = new Loanproduct;
 
 
@@ -55,6 +49,8 @@ class Loanproduct extends \Eloquent {
 		$loanproduct->amortization = array_get($data, 'amortization');
 		$loanproduct->currency = array_get($data, 'currency');
 		$loanproduct->period = array_get($data, 'period');
+		$loanproduct->auto_loan_limit = array_get($data, 'autoloanlimit');
+		$loanproduct->application_form = array_get($data, 'appform');
 		$loanproduct->save();
 
 		Audit::logAudit(date('Y-m-d'), Confide::user()->username, 'loan product creation', 'Loans', '0');

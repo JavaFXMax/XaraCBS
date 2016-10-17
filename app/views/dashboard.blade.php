@@ -10,9 +10,7 @@
 													<div>{{{ Lang::get('messages.dashboard.members') }}}</div>
 													
 												</a>
-											</div>
-
-											
+											</div>																							
 											<div class="col-md-2">
 												<a class="btn btn-default btn-icon input-block-level" href="{{URL::to('loanproducts')}}">
 													<i class="fa fa-barcode fa-2x"></i>

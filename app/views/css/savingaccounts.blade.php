@@ -14,6 +14,8 @@
 <div class="row">
 	<div class="col-lg-12">
 
+    
+
     <div class="panel panel-default">
       <div class="panel-heading">
          Saving Accounts
@@ -54,10 +56,8 @@
                   </button>
           
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="{{URL::to('memtransactions/'.$saving->id)}}">Transactions</a></li>
-                   
-                    
-                    
+                    <li><a href="{{URL::to('memtransactions/'.$saving->id)}}">Views</a></li>     
+                    <li><a href="{{ URL::to('membersavingtransactions/create/'.$saving->id)}}" >Transact </a></li> 
                   </ul>
                   </div>
 

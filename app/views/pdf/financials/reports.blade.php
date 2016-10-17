@@ -37,7 +37,10 @@
 
         <div class="form-group">
             <label for="username">As at Date </label>
-            <input class="form-control" placeholder="" type="date" name="date" id="date" value="{{date('Y-m-d')}}">
+            <div class="right-inner-addon ">
+            <i class="glyphicon glyphicon-calendar"></i>
+            <input class="form-control datepicker" readonly placeholder="" type="text" name="date" id="date" value="{{date('Y-m-d')}}">
+        </div>
         </div>
 
 

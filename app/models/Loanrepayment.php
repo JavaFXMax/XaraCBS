@@ -34,9 +34,6 @@ class Loanrepayment extends \Eloquent {
 			
 			return $paid;
 	}
-
-
-
 	public static function repayLoan($data){
 
 		$loanaccount_id = array_get($data, 'loanaccount_id');
@@ -53,19 +50,16 @@ class Loanrepayment extends \Eloquent {
 		$total_due = $principal_due + $interest_due;
 
 		$payamount = $amount;
+	 	if($payamount < $total_due){
 
- 
+				//pay interest first
+				Loanrepayment::payInterest($loanaccount, $date, $interest_due);
 
- 	if($payamount < $total_due){
+				$payamount = $payamount - $interest_due;
 
-			//pay interest first
-			Loanrepayment::payInterest($loanaccount, $date, $interest_due);
-
-			$payamount = $payamount - $interest_due;
-
-			if($payamount > 0){
-				Loanrepayment::payPrincipal($loanaccount, $date, $payamount);
-			}
+				if($payamount > 0){
+					Loanrepayment::payPrincipal($loanaccount, $date, $payamount);
+				}
 		}
 
 
@@ -79,16 +73,6 @@ class Loanrepayment extends \Eloquent {
 
 			Loanrepayment::payPrincipal($loanaccount, $date, $payamount);
 		}
-
-
-
-
-		
-
-
-
-
-
 		/*
 		do {
 
@@ -169,15 +153,7 @@ class Loanrepayment extends \Eloquent {
 
  		//pay interest
  		Loanrepayment::payInterest($loanaccount, $date, $interest_bal);
-
- 
-		
 		Loantransaction::repayLoan($loanaccount, $amount, $date);
-
-
-		
-
-
 
 	}
 

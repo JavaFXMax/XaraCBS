@@ -1,31 +1,29 @@
 @extends('layouts.loans')
 @section('content')
 <br/>
-
 <?php
-
-
 function asMoney($value) {
   return number_format($value, 2);
 }
 
 ?>
-
 <div class="row">
 	<div class="col-lg-12">
-  <h3> Loan Accounts</h3>
-
+  <h3> Loan Accounts</h3>  
 <hr>
-</div>	
 </div>
-
-
+ @if (Session::get('status'))
+      <div class="alert alert-error alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>{{{ Session::get('status') }}}</strong>  
+    </div>                       
+  @endif	
+</div>
 <div class="row">
 	<div class="col-lg-12">
-
-      
       <div role="tabpanel">
-
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#new" aria-controls="remittance" role="tab" data-toggle="tab">New Applications</a></li>
@@ -74,7 +72,6 @@ function asMoney($value) {
 
               @foreach($loanaccounts as $loanaccount)
               @if($loanaccount->is_new_application)
-
                 <tr>
                   <td>{{ $loanaccount->member->name}}</td>
                   <td>{{ $loanaccount->loanproduct->name}}</td>
@@ -91,7 +88,6 @@ function asMoney($value) {
           
                   <ul class="dropdown-menu" role="menu">
                     <!-- <li><a href="{{URL::to('loans/edit/'.$loanaccount->id)}}">Amend</a></li> -->
-                   
                     <li><a href="{{URL::to('loans/approve/'.$loanaccount->id)}}">Approve</a></li>
                     <li><a href="{{URL::to('loans/reject/'.$loanaccount->id)}}">Reject</a></li> 
                     
@@ -115,30 +111,17 @@ function asMoney($value) {
       </div>
     </div>
   </div>
-
-
-
-
-
     <div role="tabpanel" class="tab-pane" id="">
       <br>
-
       <div class="col-lg-12">
-
-
-        <div class="panel panel-default">
-            
+        <div class="panel panel-default">            
           <div class="panel-heading">
             <p>Amended Applications</p>
-
           </div>
-
         <div class="panel-body">
    
           <table id="" class="table table-condensed table-hover table-bodered">
-
             <thead>
-
               <th>Member</th>
               <th>Loan Type</th>
               <th>Date Applied</th>
@@ -193,21 +176,6 @@ function asMoney($value) {
       </div>
     </div>
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <div role="tabpanel" class="tab-pane" id="rejected">
       <br>
 
@@ -265,29 +233,16 @@ function asMoney($value) {
       </div>
     </div>
   </div>
-
-
-
-
 <div role="tabpanel" class="tab-pane" id="approved">
       <br>
-
       <div class="col-lg-12">
-
-
         <div class="panel panel-default">
-            
           <div class="panel-heading">
             <p>Approved Applications</p>
-
           </div>
-
         <div class="panel-body">
-   
           <table id="mobile" class="table table-condensed table-hover table-bodered">
-
             <thead>
-
               <th>Member</th>
               <th>Loan Type</th>
               <th>Date Applied</th>

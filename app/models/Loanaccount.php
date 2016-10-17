@@ -29,6 +29,11 @@ class Loanaccount extends \Eloquent {
 		return $this->hasMany('Loanaccount');
 	}
 
+    public static function Loans($id){
+        
+		return Loanaccount::where('member_id',$id)->get();
+	}
+
 
 	public function loantransactions(){
 
@@ -51,7 +56,6 @@ class Loanaccount extends \Eloquent {
 
 		$loanproduct = Loanproduct::findorfail($loanproduct_id);
 
-
 		$application = new Loanaccount;
 
 
@@ -65,29 +69,222 @@ class Loanaccount extends \Eloquent {
 		
 		$application->save();
 
-		Audit::logAudit(date('Y-m-d'), Confide::user()->username, 'loan application', 'Loans', array_get($data, 'amount_applied'));
+		if(array_get($data, 'amount_applied')<=$loanproduct->auto_loan_limit){
 
+		$loanaccount = Loanaccount::findorfail($application->id);
+
+		$loanaccount->date_approved = array_get($data, 'application_date');
+		$loanaccount->amount_approved = array_get($data, 'amount_applied');
+		//$loanaccount->amount_to_pay = (array_get($data, 'amount_approved')*array_get($data, 'interest_rate')/100)+array_get($data, 'amount_approved');
+		$loanaccount->interest_rate = $loanproduct->interest_rate;
+		$loanaccount->period = $loanproduct->period;
+		$loanaccount->is_approved = TRUE;
+		$loanaccount->is_new_application = FALSE;
+
+        $amount = array_get($data, 'amount_applied');
+		$date = array_get($data, 'application_date');
+
+		$loanaccount->date_disbursed = $date;
+		$loanaccount->amount_disbursed = $amount;
+		$loanaccount->repayment_start_date = array_get($data, 'application_date');
+		$loanaccount->account_number = Loanaccount::loanAccountNumber($loanaccount);
+		$loanaccount->is_disbursed = TRUE;
+		
+		$loanaccount->update();
+
+		$loanamount = $amount + Loanaccount::getInterestAmount($loanaccount);
+		Loantransaction::disburseLoan($loanaccount, $loanamount, $date);
+
+	   }
+
+        include(app_path() . '\views\AfricasTalkingGateway.php');
+
+		if(array_get($data, 'guarantor_id1') != null || array_get($data, 'guarantor_id1') != ''){
+
+		$mem_id = array_get($data, 'guarantor_id1');
+		$amount= array_get($data, 'amount_applied');		
+
+		$member1 = Member::findOrFail($mem_id);
+
+		$loanaccount = Loanaccount::findOrFail($application->id);
+
+
+		$guarantor = new Loanguarantor;
+
+		$guarantor->member()->associate($member1);
+		$guarantor->loanaccount()->associate($loanaccount);
+		$guarantor->save();
+
+		$admins=DB::table('users')->where('user_type','=','admin')->get();
+		foreach ($admins as $adm) {
+			$mail=$adm->email;
+			if($mail != null){
+		        Mail::send( 'emails.admin', array('name'=>$adm->username,'mname'=>$member->name, 'id'=>$member->id_number, 'amount_applied'=>array_get($data, 'amount_applied'),'product'=>$loanproduct->name,'application_date'=>array_get($data, 'application_date')), function( $message ) use ($adm)
+		        {
+
+		         $message->to($adm->email)->subject( 'Loan Approval and Disursement' );
+		        });
+		      }
+		}
+
+        if($member1->email != null){
+        Mail::send( 'emails.guarantor', array('name'=>$member1->name,'mname'=>$member->name, 'id'=>$member->id_number, 'amount_applied'=>array_get($data, 'amount_applied'),'product'=>$loanproduct->name,'application_date'=>array_get($data, 'application_date')), function( $message ) use ($member1)
+        {
+         $message->to($member1->email )->subject( 'Guarantor Approval' );
+        });
+        }
+		
+    // Specify your login credentials
+    $username   = "kenkode";
+    $apikey     = "7876fef8a4303ec6483dfa47479b1d2ab1b6896995763eeb620b697641eba670";
+    // Specify the numbers that you want to send to in a comma-separated list
+    // Please ensure you include the country code (+254 for Kenya in this case)
+    $recipients = $member1->phone;
+    // And of course we want our recipients to know what we really do
+    $message    = $member->name." ID ".$member->id_number." has borrowed a loan of ksh. ".array_get($data, 'amount_applied')." for loan product ".$loanproduct->name." on ".array_get($data, 'application_date')." and has selected you as his/her guarantor for amount of ".array_get($data, 'g1amount')."
+    Please login and approve or reject
+    Thank you!";
+    // Create a new instance of our awesome gateway class
+    $gateway    = new AfricasTalkingGateway($username, $apikey);
+    // Any gateway error will be captured by our custom Exception class below, 
+    // so wrap the call in a try-catch block
+    try 
+    { 
+      // Thats it, hit send and we'll take care of the rest. 
+      //$results = $gateway->sendMessage($recipients, $message);
+                
+      /*foreach($results as $result) {
+        // status is either "Success" or "error message"
+        echo " Number: " .$result->number;
+        echo " Status: " .$result->status;
+        echo " MessageId: " .$result->messageId;
+        echo " Cost: "   .$result->cost."\n";
+      }*/
+    }
+    catch ( AfricasTalkingGatewayException $e )
+    {
+      echo "Encountered an error while sending: ".$e->getMessage();
+    }
+
+    }if(array_get($data, 'guarantor_id2') != null || array_get($data, 'guarantor_id2') != ''){
+
+		$mem_id1 = array_get($data, 'guarantor_id2');
+		$amount= array_get($data, 'amount_applied');
+
+		$member2 = Member::findOrFail($mem_id1);
+
+		$loanaccount = Loanaccount::findOrFail($application->id);
+
+
+		$guarantor = new Loanguarantor;
+
+		$guarantor->member()->associate($member2);
+		$guarantor->loanaccount()->associate($loanaccount);		
+		$guarantor->save();
+
+		if($member2->email != null){
+        Mail::send( 'emails.guarantor', array('name'=>$member2->name,'mname'=>$member->name, 'id'=>$member->id_number, 'amount_applied'=>array_get($data, 'amount_applied'),'product'=>$loanproduct->name,'application_date'=>array_get($data, 'application_date')), function( $message ) use ($member2)
+        {
+         $message->to($member2->email )->subject( 'Guarantor Approval' );
+        });
+        }
+
+    // Specify your login credentials
+    $username   = "kenkode";
+    $apikey     = "7876fef8a4303ec6483dfa47479b1d2ab1b6896995763eeb620b697641eba670";
+    // Specify the numbers that you want to send to in a comma-separated list
+    // Please ensure you include the country code (+254 for Kenya in this case)
+    $recipients = $member2->phone;
+    // And of course we want our recipients to know what we really do
+    $message    = $member->name." ID ".$member->id_number." has borrowed a loan of ksh. ".array_get($data, 'amount_applied')." for loan product ".$loanproduct->name." on ".array_get($data, 'application_date')." and has selected you as his/her guarantor.
+   Please login and approve or reject
+    Thank you!";
+    // Create a new instance of our awesome gateway class
+    $gateway    = new AfricasTalkingGateway($username, $apikey);
+    // Any gateway error will be captured by our custom Exception class below, 
+    // so wrap the call in a try-catch block
+    try 
+    { 
+      // Thats it, hit send and we'll take care of the rest. 
+      //$results = $gateway->sendMessage($recipients, $message);
+                
+      /*foreach($results as $result) {
+        // status is either "Success" or "error message"
+        echo " Number: " .$result->number;
+        echo " Status: " .$result->status;
+        echo " MessageId: " .$result->messageId;
+        echo " Cost: "   .$result->cost."\n";
+      }*/
+    }
+    catch ( AfricasTalkingGatewayException $e )
+    {
+      echo "Encountered an error while sending: ".$e->getMessage();
+    }
+
+    }if(array_get($data, 'guarantor_id3') != null || array_get($data, 'guarantor_id3') != ''){
+
+		$mem_id3 = array_get($data, 'guarantor_id3');
+		$amount= array_get($data, 'amount_applied');		
+
+		$member3 = Member::findOrFail($mem_id3);
+
+		$loanaccount = Loanaccount::findOrFail($application->id);
+
+
+		$guarantor = new Loanguarantor;
+
+		$guarantor->member()->associate($member3);
+		$guarantor->loanaccount()->associate($loanaccount);		
+		$guarantor->save();
+
+		if($member3->email != null){
+        Mail::send( 'emails.guarantor', array('name'=>$member3->name,'mname'=>$member->name, 'id'=>$member->id_number, 'amount_applied'=>array_get($data, 'amount_applied'),'product'=>$loanproduct->name,'application_date'=>array_get($data, 'application_date')), function( $message ) use ($member3)
+        {
+         $message->to($member3->email )->subject( 'Guarantor Approval' );
+        });
+        }
+
+    // Specify your login credentials
+    $username   = "kenkode";
+    $apikey     = "7876fef8a4303ec6483dfa47479b1d2ab1b6896995763eeb620b697641eba670";
+    // Specify the numbers that you want to send to in a comma-separated list
+    // Please ensure you include the country code (+254 for Kenya in this case)
+    $recipients = $member3->phone;
+    // And of course we want our recipients to know what we really do
+    $message    = $member->name." ID ".$member->id_number." has borrowed a loan of ksh. ".array_get($data, 'amount_applied')." for loan product ".$loanproduct->name." on ".array_get($data, 'application_date')." and has selected you as his/her guarantor.
+    Please login and approve or reject
+    Thank you!";
+    // Create a new instance of our awesome gateway class
+    $gateway    = new AfricasTalkingGateway($username, $apikey);
+    // Any gateway error will be captured by our custom Exception class below, 
+    // so wrap the call in a try-catch block
+    try 
+    { 
+      // Thats it, hit send and we'll take care of the rest. 
+      // $results = $gateway->sendMessage($recipients, $message);
+                
+      /*foreach($results as $result) {
+        // status is either "Success" or "error message"
+        echo " Number: " .$result->number;
+        echo " Status: " .$result->status;
+        echo " MessageId: " .$result->messageId;
+        echo " Cost: "   .$result->cost."\n";
+      }*/
+    }
+    catch ( AfricasTalkingGatewayException $e )
+    {
+      echo "Encountered an error while sending: ".$e->getMessage();
+    }
+
+    }
+	Audit::logAudit(date('Y-m-d'), Confide::user()->username, 'loan application', 'Loans', array_get($data, 'amount_applied'));
 	}
-
-
-
 
 	public static function submitShopApplication($data){
 
-
-		
-
-		
-
 		$mem = array_get($data, 'member');
 
-
-
-		
-
 		$member_id = DB::table('members')->where('membership_no', '=', $mem)->pluck('id');
-
-
 		$loanproduct_id = array_get($data, 'loanproduct');
 
 
@@ -106,25 +303,14 @@ class Loanaccount extends \Eloquent {
 		$application->application_date = date('Y-m-d');
 
 		$application->amount_applied = array_get($data, 'amount');
-
-
-
-		
 		$application->interest_rate = $loanproduct->interest_rate;
 		$application->period = array_get($data, 'repayment');
-
-		
-		
 		$application->repayment_duration = array_get($data, 'repayment');
 		$application->loan_purpose = array_get($data, 'purpose');
 		$application->save();
 
 
 		Order::submitOrder($product, $member);
-
-		
-		
-
 	}
 
 

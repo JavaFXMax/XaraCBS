@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="payslip3" language="groovy" pageWidth="595" pageHeight="950" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="15439337-0d57-4439-8197-9774dfffdd6c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="103"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="PARAM_PERIOD" class="java.lang.String"/>
+	<parameter name="PARAM_ALLOWANCE" class="java.lang.String"/>
+	<parameter name="PARAM_ID" class="java.lang.String"/>
+	<parameter name="PARAM_ALL_AMOUNT" class="java.lang.String"/>
+	<parameter name="PARAM_DEDUCTION" class="java.lang.String"/>
+	<parameter name="PARAM_DED_AMOUNT" class="java.lang.String"/>
+	<parameter name="PARAM_BENEFITS" class="java.lang.String"/>
+	<parameter name="PARAM_BEN_AMOUNT" class="java.lang.String"/>
+	<parameter name="PARAM_RELIEF" class="java.lang.String"/>
+	<parameter name="PARAM_RELIEF_AMOUNT" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select employee.personal_file_number,
+employee.first_name,employee.last_name,
+employee.basic_pay,employee.pin,
+employee.identity_number,
+employee.social_security_number,
+employee.hospital_insurance_number,
+ded_employee.amount as deduction,
+daily_earning.amount as daily,
+employee_allowances.amount as allowance,
+employee_bonus.amount as bonus,
+commission,monetary_value,
+employee_relief.amount as relief,
+pension_employee.amount as pemp,
+employer_amount,tax_benefits.amount as benefits,
+tax_income.amount as t_income,
+time_earning.amount as time,net,taxable_income,
+tax,company_details.company_logo,
+nssf_amount,nhif_amount,allowance_name,transact.financial_month_year
+from employee left join daily_earning on employee.id=daily_earning.employee_id left join ded_employee on employee.id=ded_employee.employee_id left join employee_allowances on employee.id=employee_allowances.employee_id left join employee_bonus on employee.id=employee_bonus.employee_id left join employee_company_property on employee.id=employee_company_property.employee_id left join employee_commission on employee.id=employee_commission.employee_id left join employee_relief on employee.id=employee_relief.employee_id left join pension_employee on employee.id=pension_employee.employee_id left join pension_employer on employee.id=pension_employer.employee_id left join tax_benefits on employee.id=tax_benefits.employee_id left join tax_income on employee.id=tax_income.employee_id left join time_earning on employee.id=time_earning.employee_id left join transact on employee.id=transact.employee_id left join employee_allowance on employee_allowances.allowance_id=employee_allowance.id,company_details
+where transact.financial_month_year=$P{PARAM_PERIOD} AND employee.id=$P{PARAM_ID}]]>
+	</queryString>
+	<field name="personal_file_number" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="first_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="last_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="basic_pay" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="pin" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="identity_number" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="social_security_number" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="hospital_insurance_number" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="deduction" class="java.lang.Float"/>
+	<field name="daily" class="java.lang.Float"/>
+	<field name="allowance" class="java.lang.Float"/>
+	<field name="bonus" class="java.lang.Float"/>
+	<field name="commission" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="monetary_value" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="relief" class="java.lang.Float"/>
+	<field name="pemp" class="java.lang.Float"/>
+	<field name="employer_amount" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="benefits" class="java.lang.Float"/>
+	<field name="t_income" class="java.lang.Float"/>
+	<field name="time" class="java.lang.Float"/>
+	<field name="net" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="taxable_income" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tax" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="company_logo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nssf_amount" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nhif_amount" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="allowance_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="financial_month_year" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="96" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="268" height="50" uuid="c5d59f36-06f2-488d-86b3-1a0a8211b5a0"/>
+				<imageExpression><![CDATA[$F{company_logo}]]></imageExpression>
+			</image>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="62" width="555" height="32" forecolor="#000000" backcolor="#999999" uuid="6c798969-95ed-41d2-9f18-13f974ff8527"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="307" y="12" width="144" height="20" forecolor="#FFFFFF" uuid="f1feacaf-39b5-422c-b972-071f8a5edc6e"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="635" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="49" width="184" height="20" uuid="fa1b49e3-644d-4347-bfdd-13990a89b4e2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERSONAL DETAILS]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="105" width="161" height="18" uuid="2b5ed1cc-df95-47c1-bcc2-cf4dbc5ff29f"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{last_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="177" width="184" height="18" forecolor="#000000" uuid="aa3f8503-5b75-4ee3-b7ff-490d5cf9c2d8"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NHIF NUMBER:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="159" width="161" height="18" uuid="3a1c85f6-a250-41fb-98c2-9eeb293ef752"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{social_security_number}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="87" width="161" height="18" uuid="a18727f9-cd48-4320-a4f9-22e3bad7e3a1"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{first_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="159" width="184" height="18" forecolor="#000000" uuid="99e282da-5370-49c4-a5e9-818d7bc2fd08"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NSSF_NUMBER:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="177" width="161" height="18" uuid="f301b9a1-0614-4834-a504-46da19a3204f"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{hospital_insurance_number}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="141" width="184" height="18" forecolor="#000000" uuid="c60dada8-51ae-4363-b25c-c80c260eb49d"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ID NUMBER:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="141" width="161" height="18" uuid="ffded3f2-47c8-4992-b829-57e5260b84e5"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{identity_number}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="255" width="161" height="18" uuid="3d5beba4-4ff0-4789-a20f-9f1e5ab46e79"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_BEN_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="105" width="184" height="18" forecolor="#000000" uuid="4867a448-a356-48e0-a71a-01de56eac9fa"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[LAST NAME:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="237" width="161" height="18" uuid="b710f64f-5f21-44ba-bdef-1facfbd80cee"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{basic_pay}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="69" width="161" height="18" uuid="3f778d71-b80e-4986-a7bc-cd1da5afac41"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{personal_file_number}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="123" width="184" height="18" forecolor="#000000" uuid="33a507f8-d8a2-405f-9372-8d48785048c2"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[KRA PIN:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="123" width="161" height="18" uuid="b399682b-b698-4682-9737-bdeac2a53d5b"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pin}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="87" width="184" height="18" forecolor="#000000" uuid="6f8d2f87-4e8b-4f6b-9914-383fcf709fc6"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[FIRST NAME:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="215" width="184" height="20" uuid="49418da4-c366-4872-a479-84890f9b22e7"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EARNINGS]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" x="20" y="20" width="226" height="18" uuid="ce2b7de7-c52a-4d0d-b43f-e3df704a7588"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_PERIOD}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="235" width="184" height="20" uuid="069572d1-4811-4959-9abb-17e70d9f9b88"/>
+				<text><![CDATA[BASIC SALARY:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="20" y="69" width="184" height="18" forecolor="#000000" uuid="f469e704-ca03-49af-817a-f449ebd97d84"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PAYROLL NUMBER:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="314" width="161" height="18" uuid="5676d27b-1a4d-4de6-a3f6-7e0cad44085d"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_ALL_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="506" width="184" height="18" forecolor="#000000" uuid="9de754c6-e937-42db-887a-6cabc4f3d7d9"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NSSF:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="407" width="161" height="18" uuid="cea14ceb-e275-456e-90db-b46f1f830d73"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tax}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="506" width="161" height="18" uuid="a7c3bfb7-111c-4c61-a536-cbcc45508930"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nssf_amount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="578" width="161" height="18" uuid="a885cb5c-270d-4033-87f4-64437bbb8120"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_DED_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="524" width="184" height="18" forecolor="#000000" uuid="2b450819-505c-4f35-a2f3-b18ea27172c5"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NHIF:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="20" y="371" width="184" height="18" forecolor="#000000" uuid="4aabf3c0-81cd-4782-964c-d7e204a71816"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[GROSS:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="20" y="314" width="184" height="18" uuid="3a8d69f4-0c07-404d-8f6d-8e05ef819e4a"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_ALLOWANCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="542" width="184" height="18" forecolor="#000000" uuid="d1063e12-76ad-40ce-980a-f3bd506b805c"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PENSION EMPLOYEE:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="20" y="615" width="184" height="18" forecolor="#000000" uuid="20482b42-2c0c-4bc2-a1c9-17d0e22280f6"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NET:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="20" y="389" width="184" height="18" forecolor="#000000" uuid="e89aad84-3055-44c7-a5a3-a90896b75d38"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[TAXABLE INCOME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="294" width="184" height="20" uuid="fe52cc6d-6ce7-4504-8e84-66bbf88d6bbf"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ALLOWANCES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="486" width="184" height="20" uuid="671e1205-069e-4ee2-8146-f1dd9f88e771"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DEDUCTIONS]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="371" width="161" height="18" uuid="d2037226-eb0a-4902-a035-36cdca633d67"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxable_income}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="542" width="161" height="18" uuid="9b1e123a-bb34-4fb3-aafd-40939ed45669"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pemp}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="560" width="184" height="18" forecolor="#000000" uuid="48e28bfc-55f7-4ed7-95f3-2d31b45c4491"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PENSION EMPLOYER:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="20" y="407" width="184" height="18" forecolor="#000000" uuid="fd847d00-77e4-4a9d-9646-511358702426"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[TAX:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="560" width="161" height="18" uuid="effbf6ba-e583-46e7-9f4b-bada6f09264e"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{employer_amount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="615" width="161" height="18" uuid="eecba643-84f0-45ff-b929-b2f62d97380c"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{net}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="389" width="161" height="18" uuid="2c88f094-b2f5-47a0-b95a-4300a809da32"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxable_income}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="524" width="161" height="18" uuid="3b9c3a62-9860-4f84-91d9-36c479d46924"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nhif_amount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="351" width="184" height="20" uuid="1485b300-dc6a-40df-9f3e-97016afa2712"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TAX]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="20" y="578" width="184" height="18" uuid="5026546a-3fef-4873-8da0-b732dc944ea3"/>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_DEDUCTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="20" y="425" width="184" height="18" forecolor="#000000" uuid="9258e49c-80aa-47fe-bf01-fdb885bc0016"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[TAX RELIEF:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="425" width="161" height="18" uuid="a071cf7f-0fd4-4a57-9292-12ade13f8fe3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[1162]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="204" y="443" width="161" height="18" uuid="4f28e2f3-01bc-4b7b-8a9c-10e3f99304c5"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_RELIEF_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="20" y="255" width="184" height="18" uuid="cb000c38-0592-4df5-86d0-3ac06e955ba7"/>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_BENEFITS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="20" y="443" width="184" height="18" uuid="ff8701d4-55e7-4ec1-bc87-81c138a0a555"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PARAM_RELIEF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="6" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="f78d155c-694b-4290-8004-ae2121c6caac"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="99" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="14" width="555" height="85" forecolor="#D0B48E" backcolor="#CCCCCC" uuid="69af9059-1f4a-4f73-aadc-4f748bc5ec24"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="507" y="65" width="40" height="20" forecolor="#000000" uuid="fffb1ca7-347f-43ed-b5b6-1367687e6c06"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="426" y="65" width="80" height="20" forecolor="#000000" uuid="104be318-343b-4659-b61f-c1d70acd81c0"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="414" height="85" uuid="047beaf1-a0c0-407f-beec-ffaf7bb02940"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[ Lixnet Technologies Ltd.
+ P. O. Box 1963-00800, Nairobi, Kenya
+ +254 (0)20 2331085
+ +254 (0)202331102
+ 1st Floor, Riara Centre, Along Riara Road, Near Nakumatt Junction, Nairobi, Kenya
+ www.lixnet.net]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

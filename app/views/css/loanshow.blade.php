@@ -12,24 +12,36 @@ function asMoney($value) {
 ?>
 
 <div class="row">
-
 <div class="col-lg-4">
-
-
 <table class="table table-hover">
-
   <tr>
     <td>Member</td><td>{{ $loanaccount->member->name }}</td>
   </tr>
   <tr>
     <td>Loan Account</td><td>{{ $loanaccount->account_number }}</td>
   </tr>
-
 </table>
-
-
-</div>  
-
+</div>
+<div class="col-lg-8">
+@if(Session::has('caution'))
+  <div class="alert alert-danger alert-dismissible fade in" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>{{{ Session::get('caution') }}}</strong> 
+  </div>      
+@endif   
+</div>
+<div class="col-lg-8">
+  @if (Session::get('alert'))
+    <div class="alert alert-error alert-danger alert-dismissible fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <strong>{{{ Session::get('alert') }}}</strong>  
+  </div>                       
+@endif
+</div>
 
 
 <div class="col-lg-5 pull-right">
@@ -591,7 +603,6 @@ function asMoney($value) {
         <th>Member</th>
 
          <th>Loan Account</th>
-         <th>Guaranteed Amount</th>
          
            
         <th></th>
@@ -608,13 +619,7 @@ function asMoney($value) {
 
           <td> {{ $i }}</td>
           <td>{{ $guarantor->member->name }}</td>
-          <td>{{ $guarantor->loanaccount->account_number }}</td>
-          <td>{{ $guarantor->amount }}</td>
-          
-
-       
-
-           
+          <td>{{ $guarantor->loanaccount->account_number }}</td> 
 
          
 
@@ -626,8 +631,7 @@ function asMoney($value) {
                   </button>
           
                   <ul class="dropdown-menu" role="menu">
-                   
-                    <li><a href="{{URL::to('loanguarantors/edit/'.$guarantor->id)}}">Update</a></li>
+                  
                    
                     <li><a href="{{URL::to('loanguarantors/delete/'.$guarantor->id)}}">Remove</a></li>
                     

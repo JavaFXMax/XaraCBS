@@ -45,7 +45,7 @@ class LoanproductsController extends \BaseController {
 
 		Loanproduct::submit($data);
 
-		return Redirect::route('loanproducts.index');
+		return Redirect::route('loanproducts.index')->withFlashMessage('Loan Product successfully created!');
 	}
 
 	/**
@@ -59,6 +59,19 @@ class LoanproductsController extends \BaseController {
 		$loanproduct = Loanproduct::findOrFail($id);
 
 		return View::make('loanproducts.show', compact('loanproduct'));
+	}
+
+	public function memberloanshow($id)
+	{
+		/*$loanproduct = DB::table('loanaccounts')
+		          ->join('loanproducts', 'loanaccounts.loanproduct_id', '=', 'loanaccounts.id')
+		          ->join('members', 'loanaccounts.member_id', '=', 'member.id')
+		          ->where('loanaccounts','=',$id)
+		          ->select('members.name as mname','loanproducts.name as name','short_name','interest_rate','period','formula','amortization')
+		          ->first();*/
+		$loanaccount = loanaccount::findOrFail($id);
+
+		return View::make('css.memberloanshow', compact('loanaccount'));
 	}
 
 	/**
@@ -100,9 +113,10 @@ class LoanproductsController extends \BaseController {
 		$loanproduct->formula = Input::get('formula');
 		$loanproduct->period = Input::get('period');
 		$loanproduct->currency = array_get($data, 'currency');
+		$loanproduct->auto_loan_limit = array_get($data, 'autoloanlimit');
 		$loanproduct->update();
 
-		return Redirect::route('loanproducts.index');
+		return Redirect::route('loanproducts.index')->withFlashMessage('Loan Product successfully updated!');
 	}
 
 	/**

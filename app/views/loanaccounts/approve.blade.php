@@ -1,31 +1,30 @@
 @extends('layouts.accounting')
 @section('content')
 <br/>
-
+@if(Session::has('status'))
+  <div class="alert alert-danger alert-dismissible fade in" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>{{{ Session::get('status') }}}</strong> 
+  </div>      
+@endif  
 <div class="row">
 	<div class="col-lg-12">
   <h3>Loan Application</h3>
-
 <hr>
 </div>	
 </div>
-
-
 <div class="row">
 	<div class="col-lg-5">
-
-    
-		
-		 @if ($errors->has())
-        <div class="alert alert-danger">
-            @foreach ($errors->all() as $error)
-                {{ $error }}<br>        
-            @endforeach
-        </div>
-        @endif
-
+ @if ($errors->has())
+    <div class="alert alert-danger">
+        @foreach ($errors->all() as $error)
+            {{ $error }}<br>        
+        @endforeach
+    </div>
+@endif
 <table class="table table-bordered table-condensed">
-
   <tr>
     <td>Amount Applied</td> <td>{{ $loanaccount->amount_applied}}</td>
   </tr>
@@ -34,12 +33,8 @@
     </tr>
   <tr>
     <td>Interest Rate </td> <td>{{ $loanaccount->interest_rate.' %'}}</td>
-
   </tr>
-
 </table>
-       
-
 		 <form method="POST" action="{{{ URL::to('loans/approve/'.$loanaccount->id) }}}" accept-charset="UTF-8">
    
     <fieldset>
@@ -50,7 +45,10 @@
 
         <div class="form-group">
             <label for="username">Approval Date </label>
-            <input class="form-control datepicker" placeholder="" type="date" name="date_approved" id="date_approved" value="{{ date('Y-m-d') }}">
+            <div class="right-inner-addon ">
+            <i class="glyphicon glyphicon-calendar"></i>
+            <input readonly class="form-control datepicker" placeholder="" type="text" name="date_approved" id="date_approved" value="{{ date('Y-m-d') }}">
+        </div>
         </div>
 
 

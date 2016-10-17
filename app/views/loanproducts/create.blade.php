@@ -234,7 +234,7 @@
 
 
 
-
+<?php $currency = Currency::find(1); ?>
 
 
 
@@ -261,6 +261,16 @@
 
             </select>
             </div>
+            <div class="form-group">
+            <label for="username">Auto Loan Limit</label>
+
+            <div class="input-group">
+            <span class="input-group-addon">{{$currency->shortname}}</span>
+            <input class="form-control" placeholder="" type="text" name="autoloanlimit" id="autoloanlimit" value="{{{ Input::old('autoloanlimit') }}}">
+            </div>
+            </div>
+
+
 
             </div>
 
@@ -287,23 +297,21 @@
             </div>
 
             </div>
+            <div class="col-lg-5">
 
+            <div class="form-group" >
+            <label for="username">Application Form</label>
+            <select class="form-control" name="appform" >
+                <option value=""> </option>
+                <option value="Loan Application Form"> Loan Application Form</option>
+                <option value="Quick Advance Application Form"> Quick Advance Application Form</option>
 
-
+            </select>
+        </div>
+      </div>
+           
 
         </div>
-
-
-
-
-
-
-
-
-        
-
-
-
 
 
     </div>
@@ -311,6 +319,8 @@
 
 
 </div>
+
+ 
 
 
 <div class="row">
@@ -356,7 +366,7 @@
 
         </div>
 
-
+     
 
 <div class="row">
 
@@ -373,23 +383,6 @@
     </div>
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @stop

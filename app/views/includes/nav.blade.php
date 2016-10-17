@@ -97,6 +97,11 @@
 
                           <li><a href="{{ URL::to('charges') }}"><i class="fa fa-user fa-fw"></i>  Charge Management</a>
                         </li>
+
+                        <li class="divider"></li>
+
+                          <li><a href="{{ URL::to('monthlyremittances/show/1') }}"><i class="fa fa-user fa-fw"></i>  Monthly Remittance Management</a>
+                        </li>
                         
                         <li class="divider"></li>
                         <li><a href="{{ URL::to('system') }}"><i class="fa fa-sign-out fa-fw"></i> System</a>

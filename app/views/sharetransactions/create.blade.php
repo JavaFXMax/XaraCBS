@@ -47,7 +47,10 @@
 
         <div class="form-group">
             <label for="username"> Date</label>
-            <input class="form-control" placeholder="" type="date" name="date" id="date" value="{{{ Input::old('date') }}}" required>
+            <div class="right-inner-addon ">
+            <i class="glyphicon glyphicon-calendar"></i>
+            <input class="form-control datepicker" placeholder="" readonly type="text" name="date" id="date" value="{{{ Input::old('date') }}}" required>
+        </div>
         </div>
 
 

@@ -51,6 +51,7 @@ class KinsController extends \BaseController {
 		$kin->rship = Input::get('rship');
 		$kin->goodwill = Input::get('goodwill');
 		$kin->id_number = Input::get('id_number');
+		$kin->contact = Input::get('contact');
 		$kin->save();
 
 		return Redirect::to('members/show/'.$member->id);
@@ -109,7 +110,7 @@ class KinsController extends \BaseController {
 		$kin->rship = Input::get('rship');
 		$kin->goodwill = Input::get('goodwill');
 		$kin->id_number = Input::get('id_number');
-
+        $kin->contact = Input::get('contact');
 
 		$kin->update();
 

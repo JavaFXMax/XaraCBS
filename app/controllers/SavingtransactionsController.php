@@ -32,8 +32,11 @@ class SavingtransactionsController extends \BaseController {
 		$member = $savingaccount->member;
 
 		
-
-		return View::make('savingtransactions.create', compact('savingaccount', 'member', 'balance'));
+        if(Confide::user()->user_type == 'member'){
+		return View::make('css.membersavings', compact('savingaccount', 'member', 'balance'));
+	    }else{
+        return View::make('savingtransactions.create', compact('savingaccount', 'member', 'balance'));
+	    }
 
 	}
 

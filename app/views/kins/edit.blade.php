@@ -50,15 +50,11 @@
         </div>
         
 
-        
+        <div class="form-group">
+            <label for="username">Contact</label>
+            <textarea class="kindata" name="contact" id="contact">{{ $kin->contact }}</textarea>
+        </div>
 
-
-
-
-
-
-
-        
       
         
         <div class="form-actions form-group">

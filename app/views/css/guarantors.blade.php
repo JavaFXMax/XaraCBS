@@ -48,21 +48,7 @@
 
 
 
-        <div class="form-group">
-            <label for="username">Guarantee Amount </label>
-            <input class="form-control" placeholder="" type="date" name="amount" id="amount" value="{{{ Input::old('amount') }}}">
-        </div>
-
-
-        
-
-        
-      
-        
         <div class="form-actions form-group">
-        
-        
-
           <button type="submit" class="btn btn-primary btn-sm">Add Guarantor</button> 
         </div>
 

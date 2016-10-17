@@ -86,9 +86,23 @@ function asMoney($value) {
 
 
 	<tr>
+    @if($member->gender == 'M')
+		<td>Gender</td><td>Male</td>
+     @else
+     
+     @endif
 
-		<td>Gender</td><td>{{ $member->gender}}</td>
+     @if($member->gender == 'F')
+    <td>Gender</td><td>Male</td>
+     @else
+     
+     @endif
 
+     @if($member->gender == '')
+    <td>Gender</td><td></td>
+     @else
+     
+     @endif
 
 	</tr>
 
@@ -162,6 +176,7 @@ function asMoney($value) {
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#remittance" aria-controls="remittance" role="tab" data-toggle="tab">Remittance</a></li>
     <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Next Of Kin</a></li>
+    <li role="presentation"><a href="#documents" aria-controls="documents" role="tab" data-toggle="tab">Documents</a></li>
     <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Loan Accounts</a></li>
     <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Saving Accounts</a></li>
      <li role="presentation"><a href="#shares" aria-controls="shares" role="tab" data-toggle="tab">Share Accounts</a></li>
@@ -267,6 +282,50 @@ function asMoney($value) {
     </div>
 
 </div>
+
+
+<div role="tabpanel" class="tab-pane" id="documents">
+
+      <br>
+
+      <div class="col-lg-10">
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Documents
+        </div>
+        <div class="panel-body">
+
+
+    <table id="users" class="table table-condensed table-bordered table-responsive table-hover">
+                         <thead>
+                         <th>#</th>
+                         <th>Document</th>
+                         <th>Action</th>
+                         </thead>
+                         <tbody>
+                        <?php $j=1;?>
+                        @foreach($documents as $document)
+                        <tr class="del<?php echo $document->id; ?>">
+                          <td>{{$j}}</td>
+                          <td>{{$document->path}}</td>
+                          <td><a class="btn btn-danger delbtn" id="<?php echo $document->id; ?>">Delete</a></td>
+                        </tr>
+                        <?php $j++;?>
+                        @endforeach
+                    </tbody>
+                        </table>
+                    </div>
+  </div>
+
+
+  </div>
+
+
+    </div>
+
+
+
     <div role="tabpanel" class="tab-pane" id="messages">
 
 
@@ -521,7 +580,30 @@ function asMoney($value) {
 
 
 
-
+<script type="text/javascript">
+        $(document).ready(function() {
+        $('.delbtn').click( function() {
+        
+                var id = $(this).attr("id");
+         
+                if(confirm("Are you sure you want to delete this document?")){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{URL::to('deldoc')}}",
+                        data: {'id': id},
+                        cache: false,
+                        success: function(s){
+                            if(s == 0){
+                              $(".del"+id).fadeOut('slow');
+                            } 
+                        } 
+                    }); 
+                }else{
+                    return false;
+                }
+            });             
+        });
+        </script>
 
 
 
